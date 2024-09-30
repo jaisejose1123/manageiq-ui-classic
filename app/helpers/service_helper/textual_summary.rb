@@ -11,6 +11,33 @@ module ServiceHelper::TextualSummary
     TextualGroup.new(_("Properties"), %i[name description id guid])
   end
 
+  def textual_group_stack_results
+    return nil unless provisioning_get_job
+    TextualGroup.new(_("Results"), %i[status start_time finish_time elapsed_time owner])
+  end
+
+  # def textual_group_stack_results
+  #   return nil unless provisioning_get_job
+  #   TextualGroup.new(_("Results"), %i[status start_time finish_time elapsed_time owner])
+  # end
+
+  def textual_group_stack_details
+    return nil unless provisioning_get_job
+    TextualGroup.new(_("Details"), %i[playbook repository verbosity hosts])
+  end
+
+  def textual_group_stack_credentials
+    return nil unless provisioning_get_job
+    TextualGroup.new(_("Credentials"), %i[machine_credential vault_credential network_credential cloud_credential])
+  end
+
+  def textual_group_stack_plays
+    require "byebug"
+    byebug
+    return nil unless provisioning_get_job
+    fetch_job_plays
+  end
+
   def textual_group_provisioning_results
     return nil unless provisioning_get_job
     TextualGroup.new(_("Results"), %i[status start_time finish_time elapsed_time owner])
@@ -27,6 +54,8 @@ module ServiceHelper::TextualSummary
   end
 
   def textual_group_provisioning_plays
+    require "byebug"
+    byebug
     return nil unless provisioning_get_job
     fetch_job_plays
   end
@@ -187,7 +216,7 @@ module ServiceHelper::TextualSummary
   end
 
   def textual_job
-    job = @record.try(:job)
+    job = @record.try(:job, "stack")
     if job
       {
         :label => _("Job"),
@@ -234,6 +263,8 @@ module ServiceHelper::TextualSummary
   end
 
   def textual_playbook
+    require "byebug"
+    byebug
     return nil unless @job.playbook
     {:label => _("Playbook"), :value => @job.playbook.name}
   end
@@ -321,14 +352,20 @@ module ServiceHelper::TextualSummary
     @job = @record.try(:job, type)
   end
 
+  def fetch_stack_job_plays
+    require "byebug"
+    byebug
+  end
   def fetch_job_plays
+    require "byebug"
+    byebug
     items = @job.job_plays.sort_by(&:start_time).collect do |play|
       [play.name,
        format_timezone(play.start_time),
        format_timezone(play.finish_time),
        play.finish_time && play.start_time ? calculate_elapsed_time(play.start_time, play.finish_time) : '/A']
     end.sort
-
+    byebug
     TextualTable.new(
       _("Plays"),
       items,

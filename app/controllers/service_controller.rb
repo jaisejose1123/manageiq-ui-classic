@@ -171,6 +171,11 @@ class ServiceController < ApplicationController
   end
   helper_method :textual_group_list
 
+  def textual_stack_group_list
+    [%i[stack_results stack_plays], %i[stack_details stack_credentials]]
+  end
+  helper_method :textual_stack_group_list
+
   def textual_provisioning_group_list
     [%i[provisioning_results provisioning_plays], %i[provisioning_details provisioning_credentials]]
   end
